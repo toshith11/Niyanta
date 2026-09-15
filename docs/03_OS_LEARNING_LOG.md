@@ -67,3 +67,38 @@ can execute our kernel?
 ### Next experiment
 
 Create and boot the first Niyanta kernel in QEMU.
+
+## Step 3 Experiment — Rule-Based Understanding
+
+### Goal
+Test whether simple keyword rules can understand natural language commands.
+
+### Successful cases
+
+- "Can you tell me the time?" → QUESTION
+- "Please open Chrome for me" → APPLICATION
+- "Could you show me what's inside my folders?" → FILE
+
+### Failed cases
+
+- "How much free memory do I have?" → UNKNOWN
+- "I want to investigate neuromorphic computing" → UNKNOWN
+
+### Observation
+
+Keyword-based classification works for expected phrases
+but fails when the user expresses the same intent using
+different words.
+
+### Conclusion
+
+Sūtrādhār needs an understanding layer that identifies
+meaning rather than relying only on exact keywords.
+
+### Next improvement
+
+Introduce:
+- intent patterns
+- synonyms
+- entity extraction
+- confidence
