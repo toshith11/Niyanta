@@ -102,3 +102,54 @@ Introduce:
 - synonyms
 - entity extraction
 - confidence
+
+## Step 3.1 Experiment — Pattern-Based Understanding
+
+### Goal
+
+Improve Sūtrādhār's understanding beyond simple keyword matching.
+
+### Successful cases
+
+- "How much free memory do I have?" → SYSTEM / MEMORY
+- "Please open Chrome for me" → APPLICATION / CHROME
+- "I want to investigate neuromorphic computing" → RESEARCH / topic
+- "I want to study operating systems" → RESEARCH / topic
+- "What is my battery level?" → SYSTEM / BATTERY
+
+### Failed case
+
+- "Can you tell me the time?" → UNKNOWN
+
+### Observation
+
+The classifier now recognizes synonyms and extracts
+basic targets, but it still depends on predefined
+sentence patterns.
+
+### New limitation
+
+Intent and target are not sufficient for executing
+complex commands.
+
+Example:
+
+"Remember that my project is Niyanta"
+
+is recognized as MEMORY, but the information to store
+is not extracted.
+
+### Conclusion
+
+The understanding model should evolve toward:
+
+Input
+→ Intent
+→ Action
+→ Entity
+→ Parameters
+→ Confidence
+
+### Next objective
+
+Introduce action identification and entity extraction.

@@ -21,11 +21,12 @@ public class Commander {
             System.out.print("You: ");
             String input = scanner.nextLine();
 
-            Intent intent = understanding.understand(input);
+            UnderstandingResult result =
+                    understanding.understand(input);
 
-            System.out.println("Intent: " + intent);
+            System.out.println("Sūtrādhār: " + result);
 
-            if (intent == Intent.EXIT) {
+            if (result.getIntent() == Intent.EXIT) {
                 System.out.println("Sūtrādhār: Shutting down.");
                 break;
             }
