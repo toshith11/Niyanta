@@ -1,3 +1,4 @@
+package commander.core;
 public class Understanding {
 
     public CommandUnderstanding understand(String input) {
@@ -89,6 +90,17 @@ public class Understanding {
                     null
             );
         }
+        if (isMemoryQuestion(text)) {
+
+    return new CommandUnderstanding(
+            Intent.MEMORY,
+            "RECALL",
+            "PROJECT",
+            "NAME",
+            0.90,
+            null
+    );
+}
 
         if (isQuestion(text)) {
             return new CommandUnderstanding(
@@ -280,4 +292,12 @@ public class Understanding {
 
         return "UNKNOWN_APPLICATION";
     }
+    private boolean isMemoryQuestion(String text) {
+
+    return text.contains("what is my project")
+            || text.contains("what's my project")
+            || text.contains("tell me my project")
+            || text.contains("what project am i working on");
 }
+}
+

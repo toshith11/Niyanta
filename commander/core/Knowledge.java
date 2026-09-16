@@ -1,3 +1,4 @@
+package commander.core;
 public class Knowledge {
 
     private final String subject;

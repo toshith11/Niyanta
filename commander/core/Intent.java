@@ -1,3 +1,4 @@
+package commander.core;
 public enum Intent {
     GREETING,
     QUESTION,

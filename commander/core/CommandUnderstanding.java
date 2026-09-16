@@ -1,3 +1,4 @@
+package commander.core;
 public class CommandUnderstanding {
 
     private final Intent intent;
