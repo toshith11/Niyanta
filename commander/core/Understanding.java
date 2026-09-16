@@ -10,7 +10,8 @@ public class Understanding {
                     "EXIT",
                     null,
                     null,
-                    1.0
+                    1.0,
+                    null
             );
         }
 
@@ -20,7 +21,8 @@ public class Understanding {
                     "RESPOND",
                     null,
                     null,
-                    0.95
+                    0.95,
+                    null
             );
         }
 
@@ -32,19 +34,22 @@ public class Understanding {
                     "SEARCH",
                     "TOPIC",
                     topic,
-                    0.90
+                    0.90,
+                    null
             );
         }
 
         if (isMemory(text)) {
             String memory = extractMemory(text);
+            Knowledge knowledge = extractMemoryKnowledge(memory);
 
             return new CommandUnderstanding(
                     Intent.MEMORY,
                     "STORE",
                     "MEMORY",
                     memory,
-                    0.90
+                    0.90,
+                    knowledge
             );
         }
 
@@ -54,7 +59,8 @@ public class Understanding {
                     "LIST",
                     "FILES",
                     null,
-                    0.85
+                    0.85,
+                    null
             );
         }
 
@@ -66,7 +72,8 @@ public class Understanding {
                     "OPEN",
                     application,
                     null,
-                    0.90
+                    0.90,
+                    null
             );
         }
 
@@ -78,7 +85,8 @@ public class Understanding {
                     "GET_STATUS",
                     target,
                     null,
-                    0.90
+                    0.90,
+                    null
             );
         }
 
@@ -88,7 +96,8 @@ public class Understanding {
                     "ANSWER",
                     null,
                     text,
-                    0.75
+                    0.75,
+                    null
             );
         }
 
@@ -97,7 +106,8 @@ public class Understanding {
                 "NONE",
                 null,
                 null,
-                0.20
+                0.20,
+                null
         );
     }
 
@@ -178,13 +188,10 @@ public class Understanding {
         };
 
         for (String marker : markers) {
-
             int index = text.indexOf(marker);
 
             if (index != -1) {
-                return text.substring(
-                        index + marker.length()
-                ).trim();
+                return text.substring(index + marker.length()).trim();
             }
         }
 
@@ -201,14 +208,34 @@ public class Understanding {
         };
 
         for (String marker : markers) {
-
             int index = text.indexOf(marker);
 
             if (index != -1) {
-                return text.substring(
-                        index + marker.length()
-                ).trim();
+                return text.substring(index + marker.length()).trim();
             }
+        }
+
+        return null;
+    }
+
+    private Knowledge extractMemoryKnowledge(String memory) {
+
+        if (memory == null) {
+            return null;
+        }
+
+        if (memory.contains("my project is")) {
+
+            String value = memory.substring(
+                    memory.indexOf("my project is")
+                            + "my project is".length()
+            ).trim();
+
+            return new Knowledge(
+                    "PROJECT",
+                    "NAME",
+                    value
+            );
         }
 
         return null;
@@ -246,7 +273,6 @@ public class Understanding {
         };
 
         for (String application : applications) {
-
             if (text.contains(application)) {
                 return application.toUpperCase();
             }

@@ -5,19 +5,22 @@ public class CommandUnderstanding {
     private final String entity;
     private final String parameter;
     private final double confidence;
+    private final Knowledge knowledge;
 
     public CommandUnderstanding(
             Intent intent,
             String action,
             String entity,
             String parameter,
-            double confidence) {
+            double confidence,
+            Knowledge knowledge) {
 
         this.intent = intent;
         this.action = action;
         this.entity = entity;
         this.parameter = parameter;
         this.confidence = confidence;
+        this.knowledge = knowledge;
     }
 
     public Intent getIntent() {
@@ -40,12 +43,17 @@ public class CommandUnderstanding {
         return confidence;
     }
 
+    public Knowledge getKnowledge() {
+    return knowledge;
+}
+
     @Override
     public String toString() {
         return "Intent: " + intent +
                 ", Action: " + action +
                 ", Entity: " + entity +
                 ", Parameter: " + parameter +
-                ", Confidence: " + confidence;
+                ", Confidence: " + confidence+
+                ", Knowledge: " + knowledge;
     }
 }
