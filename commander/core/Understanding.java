@@ -1,45 +1,104 @@
 public class Understanding {
 
-    public UnderstandingResult understand(String input) {
+    public CommandUnderstanding understand(String input) {
 
         String text = normalize(input);
 
         if (isExit(text)) {
-            return new UnderstandingResult(Intent.EXIT, null, 1.0);
+            return new CommandUnderstanding(
+                    Intent.EXIT,
+                    "EXIT",
+                    null,
+                    null,
+                    1.0
+            );
         }
 
         if (isGreeting(text)) {
-            return new UnderstandingResult(Intent.GREETING, null, 0.95);
+            return new CommandUnderstanding(
+                    Intent.GREETING,
+                    "RESPOND",
+                    null,
+                    null,
+                    0.95
+            );
         }
 
         if (isResearch(text)) {
             String topic = extractResearchTopic(text);
-            return new UnderstandingResult(Intent.RESEARCH, topic, 0.90);
+
+            return new CommandUnderstanding(
+                    Intent.RESEARCH,
+                    "SEARCH",
+                    "TOPIC",
+                    topic,
+                    0.90
+            );
         }
 
         if (isMemory(text)) {
-            return new UnderstandingResult(Intent.MEMORY, null, 0.90);
+            String memory = extractMemory(text);
+
+            return new CommandUnderstanding(
+                    Intent.MEMORY,
+                    "STORE",
+                    "MEMORY",
+                    memory,
+                    0.90
+            );
         }
 
         if (isFile(text)) {
-            return new UnderstandingResult(Intent.FILE, null, 0.85);
+            return new CommandUnderstanding(
+                    Intent.FILE,
+                    "LIST",
+                    "FILES",
+                    null,
+                    0.85
+            );
         }
 
         if (isApplication(text)) {
             String application = extractApplication(text);
-            return new UnderstandingResult(Intent.APPLICATION, application, 0.90);
+
+            return new CommandUnderstanding(
+                    Intent.APPLICATION,
+                    "OPEN",
+                    application,
+                    null,
+                    0.90
+            );
         }
 
         if (isSystem(text)) {
             String target = extractSystemTarget(text);
-            return new UnderstandingResult(Intent.SYSTEM, target, 0.90);
+
+            return new CommandUnderstanding(
+                    Intent.SYSTEM,
+                    "GET_STATUS",
+                    target,
+                    null,
+                    0.90
+            );
         }
 
         if (isQuestion(text)) {
-            return new UnderstandingResult(Intent.QUESTION, null, 0.75);
+            return new CommandUnderstanding(
+                    Intent.QUESTION,
+                    "ANSWER",
+                    null,
+                    text,
+                    0.75
+            );
         }
 
-        return new UnderstandingResult(Intent.UNKNOWN, null, 0.20);
+        return new CommandUnderstanding(
+                Intent.UNKNOWN,
+                "NONE",
+                null,
+                null,
+                0.20
+        );
     }
 
     private String normalize(String input) {
@@ -103,7 +162,8 @@ public class Understanding {
                 || text.startsWith("why ")
                 || text.startsWith("when ")
                 || text.startsWith("where ")
-                || text.startsWith("who ");
+                || text.startsWith("who ")
+                || text.startsWith("can you ");
     }
 
     private String extractResearchTopic(String text) {
@@ -118,10 +178,36 @@ public class Understanding {
         };
 
         for (String marker : markers) {
+
             int index = text.indexOf(marker);
 
             if (index != -1) {
-                return text.substring(index + marker.length()).trim();
+                return text.substring(
+                        index + marker.length()
+                ).trim();
+            }
+        }
+
+        return null;
+    }
+
+    private String extractMemory(String text) {
+
+        String[] markers = {
+                "remember that ",
+                "remember ",
+                "memorize ",
+                "save this "
+        };
+
+        for (String marker : markers) {
+
+            int index = text.indexOf(marker);
+
+            if (index != -1) {
+                return text.substring(
+                        index + marker.length()
+                ).trim();
             }
         }
 
@@ -160,11 +246,12 @@ public class Understanding {
         };
 
         for (String application : applications) {
+
             if (text.contains(application)) {
                 return application.toUpperCase();
             }
         }
 
-        return null;
+        return "UNKNOWN_APPLICATION";
     }
 }

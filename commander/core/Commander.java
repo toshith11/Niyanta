@@ -21,7 +21,7 @@ public class Commander {
             System.out.print("You: ");
             String input = scanner.nextLine();
 
-            UnderstandingResult result =
+            CommandUnderstanding result =
                     understanding.understand(input);
 
             System.out.println("Sūtrādhār: " + result);
