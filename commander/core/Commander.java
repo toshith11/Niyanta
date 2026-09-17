@@ -2,7 +2,6 @@ package commander.core;
 import commander.memory.MemoryManager;
 import java.util.Scanner;
 
-import commander.memory.MemoryManager;
 
 public class Commander {
 

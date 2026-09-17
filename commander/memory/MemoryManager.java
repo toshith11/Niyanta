@@ -1,9 +1,11 @@
 package commander.memory;
+
 import commander.core.Knowledge;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
+import java.util.ArrayList;
 import java.util.List;
 
 public class MemoryManager {
@@ -11,7 +13,10 @@ public class MemoryManager {
     private final Path memoryFile;
 
     public MemoryManager() {
-        memoryFile = Path.of("commander/memory/memory.txt");
+
+        memoryFile = Path.of(
+                "commander/memory/memory.txt"
+        );
 
         try {
             Files.createDirectories(memoryFile.getParent());
@@ -21,7 +26,10 @@ public class MemoryManager {
             }
 
         } catch (IOException e) {
-            throw new RuntimeException("Could not initialize memory.", e);
+            throw new RuntimeException(
+                    "Could not initialize memory.",
+                    e
+            );
         }
     }
 
@@ -31,44 +39,116 @@ public class MemoryManager {
             return;
         }
 
-        String record =
-                knowledge.getSubject() + "|" +
-                knowledge.getRelation() + "|" +
-                knowledge.getValue();
+        MemoryRecord newMemory = new MemoryRecord(
+                MemoryType.LONG_TERM,
+                knowledge.getSubject(),
+                knowledge.getRelation(),
+                knowledge.getValue()
+        );
 
-        try {
-            Files.writeString(
-                    memoryFile,
-                    record + System.lineSeparator(),
-                    StandardOpenOption.APPEND
-            );
+        List<MemoryRecord> memories = loadMemories();
 
-        } catch (IOException e) {
-            throw new RuntimeException("Could not store memory.", e);
+        boolean updated = false;
+
+        for (int i = 0; i < memories.size(); i++) {
+
+            MemoryRecord existing = memories.get(i);
+
+            if (existing.getSubject()
+                    .equalsIgnoreCase(newMemory.getSubject())
+                    &&
+                existing.getRelation()
+                    .equalsIgnoreCase(newMemory.getRelation())) {
+
+                memories.set(i, newMemory);
+                updated = true;
+                break;
+            }
         }
+
+        if (!updated) {
+            memories.add(newMemory);
+        }
+
+        saveMemories(memories);
     }
 
     public String recall(String subject, String relation) {
 
-        try {
-            List<String> records = Files.readAllLines(memoryFile);
+        List<MemoryRecord> memories = loadMemories();
 
-            for (String record : records) {
+        for (MemoryRecord memory : memories) {
 
-                String[] parts = record.split("\\|", 3);
+            if (memory.getSubject()
+                    .equalsIgnoreCase(subject)
+                    &&
+                memory.getRelation()
+                    .equalsIgnoreCase(relation)) {
 
-                if (parts.length == 3 &&
-                        parts[0].equalsIgnoreCase(subject) &&
-                        parts[1].equalsIgnoreCase(relation)) {
-
-                    return parts[2];
-                }
+                return memory.getValue();
             }
-
-        } catch (IOException e) {
-            throw new RuntimeException("Could not read memory.", e);
         }
 
         return null;
+    }
+
+    private List<MemoryRecord> loadMemories() {
+
+        List<MemoryRecord> memories = new ArrayList<>();
+
+        try {
+
+            List<String> lines =
+                    Files.readAllLines(memoryFile);
+
+            for (String line : lines) {
+
+                String[] parts = line.split("\\|", 4);
+
+                if (parts.length != 4) {
+                    continue;
+                }
+
+                MemoryRecord memory = new MemoryRecord(
+        MemoryType.valueOf(parts[0].trim()),
+        parts[1].trim(),
+        parts[2].trim(),
+        parts[3].trim()
+);
+
+                memories.add(memory);
+            }
+
+        } catch (IOException e) {
+            throw new RuntimeException(
+                    "Could not load memory.",
+                    e
+            );
+        }
+
+        return memories;
+    }
+
+    private void saveMemories(List<MemoryRecord> memories) {
+
+        List<String> lines = new ArrayList<>();
+
+        for (MemoryRecord memory : memories) {
+            lines.add(memory.toString());
+        }
+
+        try {
+
+            Files.write(
+                    memoryFile,
+                    lines
+            );
+
+        } catch (IOException e) {
+            throw new RuntimeException(
+                    "Could not save memory.",
+                    e
+            );
+        }
     }
 }

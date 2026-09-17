@@ -232,26 +232,26 @@ public class Understanding {
 
     private Knowledge extractMemoryKnowledge(String memory) {
 
-        if (memory == null) {
-            return null;
-        }
-
-        if (memory.contains("my project is")) {
-
-            String value = memory.substring(
-                    memory.indexOf("my project is")
-                            + "my project is".length()
-            ).trim();
-
-            return new Knowledge(
-                    "PROJECT",
-                    "NAME",
-                    value
-            );
-        }
-
+    if (memory == null) {
         return null;
     }
+
+    if (memory.contains("my project is")) {
+
+        String value = memory.substring(
+                memory.indexOf("my project is")
+                        + "my project is".length()
+        ).trim();
+
+        return new Knowledge(
+                "PROJECT",
+                "NAME",
+                value
+        );
+    }
+
+    return null;
+}
 
     private String extractSystemTarget(String text) {
 
