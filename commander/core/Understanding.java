@@ -170,13 +170,16 @@ public class Understanding {
     }
 
     private boolean isSystem(String text) {
-        return text.contains("battery")
-                || text.contains("memory")
-                || text.contains("ram")
-                || text.contains("storage")
-                || text.contains("cpu")
-                || text.contains("system status");
-    }
+
+    return text.contains("battery")
+            || text.contains("memory")
+            || text.contains("ram")
+            || text.contains("storage")
+            || text.contains("cpu")
+            || text.contains("processor")
+            || text.contains("process")
+            || text.contains("system status");
+}
 
     private boolean isQuestion(String text) {
         return text.startsWith("what ")
@@ -255,24 +258,28 @@ public class Understanding {
 
     private String extractSystemTarget(String text) {
 
-        if (text.contains("memory") || text.contains("ram")) {
-            return "MEMORY";
-        }
-
-        if (text.contains("battery")) {
-            return "BATTERY";
-        }
-
-        if (text.contains("storage")) {
-            return "STORAGE";
-        }
-
-        if (text.contains("cpu")) {
-            return "CPU";
-        }
-
-        return "SYSTEM";
+    if (text.contains("memory") || text.contains("ram")) {
+        return "MEMORY";
     }
+
+    if (text.contains("battery")) {
+        return "BATTERY";
+    }
+
+    if (text.contains("storage")) {
+        return "STORAGE";
+    }
+
+    if (text.contains("cpu") || text.contains("processor")) {
+        return "CPU";
+    }
+
+    if (text.contains("process")) {
+        return "PROCESSES";
+    }
+
+    return "SYSTEM";
+}
 
     private String extractApplication(String text) {
 
