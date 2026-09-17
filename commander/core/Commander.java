@@ -1,5 +1,6 @@
 package commander.core;
 import commander.memory.MemoryManager;
+import commander.system.SystemInterface;
 import java.util.Scanner;
 
 
@@ -7,10 +8,12 @@ public class Commander {
 
     private final Understanding understanding;
     private final MemoryManager memoryManager;
+    private final SystemInterface systemInterface;
 
     public Commander() {
         understanding = new Understanding();
         memoryManager = new MemoryManager();
+        systemInterface = new SystemInterface();
     }
 
     public void start() {
@@ -28,6 +31,36 @@ public class Commander {
 
             CommandUnderstanding result =
                     understanding.understand(input);
+                    if (result.getIntent() == Intent.SYSTEM ||
+        result.getIntent() == Intent.QUESTION) {
+
+    if ("GET_STATUS".equals(result.getAction())
+        && "MEMORY".equals(result.getEntity())) {
+
+    System.out.println(
+            "Sūtrādhār: " +
+            systemInterface.getMemoryStatus()
+    );
+
+    } else if ("ANSWER".equals(result.getAction())
+            && result.getParameter().contains("time")) {
+
+        System.out.println(
+                "Sūtrādhār: The current time is "
+                        + systemInterface.getCurrentTime()
+                        + "."
+        );
+
+    } else if ("GET_STATUS".equals(result.getAction())) {
+
+        System.out.println(
+                "Sūtrādhār: "
+                        + systemInterface.getSystemStatus()
+        );
+    }
+
+    continue;
+}
 
             if (result.getIntent() == Intent.MEMORY) {
 
