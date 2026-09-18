@@ -10,50 +10,56 @@ public class ActionEngine {
     public ActionResult execute(CommandUnderstanding command) {
 
         if (command == null) {
+
             return new ActionResult(
                     false,
                     "No command received."
             );
         }
 
-        if (command.getIntent() == Intent.FILE
-                && "LIST".equals(command.getAction())) {
+        return switch (command.getAction()) {
 
-            return listFiles();
-        }
+            case LIST_FILES ->
+                    listFiles();
 
-        if (command.getIntent() == Intent.APPLICATION
-                && "OPEN".equals(command.getAction())) {
+            case OPEN_APPLICATION ->
+                    openApplication(
+                            command.getEntity()
+                    );
 
-            return openApplication(
-                    command.getEntity()
-            );
-        }
+            case RESPOND ->
+                    new ActionResult(
+                            true,
+                            "Hello. I am Sūtrādhār."
+                    );
 
-        if (command.getIntent() == Intent.GREETING
-                && "RESPOND".equals(command.getAction())) {
+            case SEARCH ->
+                    new ActionResult(
+                            false,
+                            "Research execution is not implemented yet."
+                    );
 
-            return new ActionResult(
-                    true,
-                    "Hello. I am Sūtrādhār."
-            );
-        }
-
-        return new ActionResult(
-                false,
-                "I understand the command, but I cannot execute it yet."
-        );
+            default ->
+                    new ActionResult(
+                            false,
+                            "I understand the command, but I cannot execute it yet."
+                    );
+        };
     }
 
     private ActionResult listFiles() {
 
         Path currentDirectory =
-                Path.of(".").toAbsolutePath().normalize();
+                Path.of(".")
+                        .toAbsolutePath()
+                        .normalize();
 
         try {
 
             String files = Files.list(currentDirectory)
-                    .map(path -> path.getFileName().toString())
+                    .map(path ->
+                            path.getFileName().toString()
+                    )
                     .sorted()
                     .collect(Collectors.joining("\n"));
 
@@ -71,19 +77,17 @@ public class ActionEngine {
         }
     }
 
-    private ActionResult openApplication(String application) {
+    private ActionResult openApplication(
+            String application) {
 
         if (application == null) {
+
             return new ActionResult(
                     false,
                     "No application was specified."
             );
         }
 
-        /*
-         * We are deliberately not launching applications yet.
-         * This keeps Step 6 safe while we build the action architecture.
-         */
         return new ActionResult(
                 false,
                 "Application control is not implemented yet: "

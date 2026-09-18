@@ -1,8 +1,9 @@
 package commander.core;
+
 public class CommandUnderstanding {
 
     private final Intent intent;
-    private final String action;
+    private final Action action;
     private final String entity;
     private final String parameter;
     private final double confidence;
@@ -10,7 +11,7 @@ public class CommandUnderstanding {
 
     public CommandUnderstanding(
             Intent intent,
-            String action,
+            Action action,
             String entity,
             String parameter,
             double confidence,
@@ -28,7 +29,7 @@ public class CommandUnderstanding {
         return intent;
     }
 
-    public String getAction() {
+    public Action getAction() {
         return action;
     }
 
@@ -45,8 +46,8 @@ public class CommandUnderstanding {
     }
 
     public Knowledge getKnowledge() {
-    return knowledge;
-}
+        return knowledge;
+    }
 
     @Override
     public String toString() {
@@ -54,7 +55,7 @@ public class CommandUnderstanding {
                 ", Action: " + action +
                 ", Entity: " + entity +
                 ", Parameter: " + parameter +
-                ", Confidence: " + confidence+
+                ", Confidence: " + confidence +
                 ", Knowledge: " + knowledge;
     }
 }

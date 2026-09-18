@@ -1,127 +1,247 @@
 package commander.core;
 public class Understanding {
 
-    public CommandUnderstanding understand(String input) {
+   public CommandUnderstanding understand(String input) {
 
-        String text = normalize(input);
+    String text = normalize(input);
 
-        if (isExit(text)) {
-            return new CommandUnderstanding(
-                    Intent.EXIT,
-                    "EXIT",
-                    null,
-                    null,
-                    1.0,
-                    null
-            );
-        }
-
-        if (isGreeting(text)) {
-            return new CommandUnderstanding(
-                    Intent.GREETING,
-                    "RESPOND",
-                    null,
-                    null,
-                    0.95,
-                    null
-            );
-        }
-
-        if (isResearch(text)) {
-            String topic = extractResearchTopic(text);
-
-            return new CommandUnderstanding(
-                    Intent.RESEARCH,
-                    "SEARCH",
-                    "TOPIC",
-                    topic,
-                    0.90,
-                    null
-            );
-        }
-
-        if (isMemory(text)) {
-            String memory = extractMemory(text);
-            Knowledge knowledge = extractMemoryKnowledge(memory);
-
-            return new CommandUnderstanding(
-                    Intent.MEMORY,
-                    "STORE",
-                    "MEMORY",
-                    memory,
-                    0.90,
-                    knowledge
-            );
-        }
-
-        if (isFile(text)) {
-            return new CommandUnderstanding(
-                    Intent.FILE,
-                    "LIST",
-                    "FILES",
-                    null,
-                    0.85,
-                    null
-            );
-        }
-
-        if (isApplication(text)) {
-            String application = extractApplication(text);
-
-            return new CommandUnderstanding(
-                    Intent.APPLICATION,
-                    "OPEN",
-                    application,
-                    null,
-                    0.90,
-                    null
-            );
-        }
-
-        if (isSystem(text)) {
-            String target = extractSystemTarget(text);
-
-            return new CommandUnderstanding(
-                    Intent.SYSTEM,
-                    "GET_STATUS",
-                    target,
-                    null,
-                    0.90,
-                    null
-            );
-        }
-        if (isMemoryQuestion(text)) {
-
-    return new CommandUnderstanding(
-            Intent.MEMORY,
-            "RECALL",
-            "PROJECT",
-            "NAME",
-            0.90,
-            null
-    );
-}
-
-        if (isQuestion(text)) {
-            return new CommandUnderstanding(
-                    Intent.QUESTION,
-                    "ANSWER",
-                    null,
-                    text,
-                    0.75,
-                    null
-            );
-        }
-
+    /*
+     * EXIT
+     */
+    if (isExit(text)) {
         return new CommandUnderstanding(
-                Intent.UNKNOWN,
-                "NONE",
+                Intent.EXIT,
+                Action.EXIT,
                 null,
                 null,
-                0.20,
+                1.0,
                 null
         );
     }
+
+    /*
+     * GREETING
+     */
+    if (isGreeting(text)) {
+        return new CommandUnderstanding(
+                Intent.GREETING,
+                Action.RESPOND,
+                null,
+                null,
+                0.95,
+                null
+        );
+    }
+
+    /*
+     * RESEARCH
+     */
+    if (isResearch(text)) {
+
+        String topic = extractResearchTopic(text);
+
+        return new CommandUnderstanding(
+                Intent.RESEARCH,
+                Action.SEARCH,
+                "TOPIC",
+                topic,
+                0.90,
+                null
+        );
+    }
+
+    /*
+     * MEMORY
+     */
+    if (isMemory(text)) {
+
+        String memory = extractMemory(text);
+        Knowledge knowledge = extractMemoryKnowledge(memory);
+
+        return new CommandUnderstanding(
+                Intent.MEMORY,
+                Action.STORE_MEMORY,
+                "MEMORY",
+                memory,
+                0.90,
+                knowledge
+        );
+    }
+
+    /*
+     * FILE
+     */
+    if (isFile(text)) {
+
+        return new CommandUnderstanding(
+                Intent.FILE,
+                Action.LIST_FILES,
+                "FILES",
+                null,
+                0.85,
+                null
+        );
+    }
+
+    /*
+     * APPLICATION
+     */
+    if (isApplication(text)) {
+
+        String application = extractApplication(text);
+
+        return new CommandUnderstanding(
+                Intent.APPLICATION,
+                Action.OPEN_APPLICATION,
+                application,
+                null,
+                0.90,
+                null
+        );
+    }
+
+    /*
+     * SYSTEM
+     */
+    if (isSystem(text)) {
+
+        String target = extractSystemTarget(text);
+
+        if ("MEMORY".equals(target)) {
+
+            return new CommandUnderstanding(
+                    Intent.SYSTEM,
+                    Action.GET_MEMORY_STATUS,
+                    "MEMORY",
+                    null,
+                    0.90,
+                    null
+            );
+        }
+
+        if ("CPU".equals(target)) {
+
+            return new CommandUnderstanding(
+                    Intent.SYSTEM,
+                    Action.GET_CPU_STATUS,
+                    "CPU",
+                    null,
+                    0.90,
+                    null
+            );
+        }
+
+        if ("STORAGE".equals(target)) {
+
+            return new CommandUnderstanding(
+                    Intent.SYSTEM,
+                    Action.GET_STORAGE_STATUS,
+                    "STORAGE",
+                    null,
+                    0.90,
+                    null
+            );
+        }
+
+        if ("PROCESSES".equals(target)) {
+
+            return new CommandUnderstanding(
+                    Intent.SYSTEM,
+                    Action.GET_PROCESS_STATUS,
+                    "PROCESSES",
+                    null,
+                    0.90,
+                    null
+            );
+        }
+
+        if ("SNAPSHOT".equals(target)) {
+
+            return new CommandUnderstanding(
+                    Intent.SYSTEM,
+                    Action.GET_SYSTEM_SNAPSHOT,
+                    "SNAPSHOT",
+                    null,
+                    0.90,
+                    null
+            );
+        }
+
+        /*
+         * Fallback for generic system requests
+         */
+        return new CommandUnderstanding(
+                Intent.SYSTEM,
+                Action.NONE,
+                "SYSTEM",
+                null,
+                0.70,
+                null
+        );
+    }
+
+    /*
+     * MEMORY RECALL
+     */
+    if (isMemoryQuestion(text)) {
+
+        return new CommandUnderstanding(
+                Intent.MEMORY,
+                Action.RECALL_MEMORY,
+                "PROJECT",
+                "NAME",
+                0.90,
+                null
+        );
+    }
+
+    /*
+     * QUESTION
+     */
+    if (isQuestion(text)) {
+
+        /*
+         * Time question
+         */
+        if (text.contains("time")) {
+
+            return new CommandUnderstanding(
+                    Intent.QUESTION,
+                    Action.GET_TIME,
+                    "TIME",
+                    text,
+                    0.90,
+                    null
+            );
+        }
+
+        /*
+         * Generic question
+         * We understand the input, but don't have
+         * a specific executable action yet.
+         */
+        return new CommandUnderstanding(
+                Intent.QUESTION,
+                Action.NONE,
+                null,
+                text,
+                0.75,
+                null
+        );
+    }
+
+    /*
+     * UNKNOWN
+     */
+    return new CommandUnderstanding(
+            Intent.UNKNOWN,
+            Action.NONE,
+            null,
+            null,
+            0.20,
+            null
+    );
+}
 
     private String normalize(String input) {
         return input.toLowerCase().trim();

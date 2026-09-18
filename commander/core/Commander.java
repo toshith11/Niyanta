@@ -39,113 +39,57 @@ public class Commander {
             /*
              * EXIT
              */
-            if (result.getIntent() == Intent.EXIT) {
+            if (result.getAction() == Action.EXIT) {
 
-                System.out.println("Sūtrādhār: " + result);
-                System.out.println("Sūtrādhār: Shutting down.");
+                System.out.println(
+                        "Sūtrādhār: " + result
+                );
+
+                System.out.println(
+                        "Sūtrādhār: Shutting down."
+                );
 
                 break;
             }
 
             /*
-             * SYSTEM / QUESTION
+             * MEMORY STORE
              */
-            if (result.getIntent() == Intent.SYSTEM
-                    || result.getIntent() == Intent.QUESTION) {
+            if (result.getAction() == Action.STORE_MEMORY) {
 
-                /*
-                 * MEMORY STATUS
-                 */
-                        if ("GET_STATUS".equals(result.getAction())
-        && "SNAPSHOT".equals(result.getEntity())) {
+                memoryManager.remember(
+                        result.getKnowledge()
+                );
 
-    SystemSnapshot snapshot =
-            systemInterface.getSystemSnapshot();
+                System.out.println(
+                        "Sūtrādhār: Memory stored."
+                );
 
-    System.out.println(
-            "Sūtrādhār:\n" + snapshot
-    );
+                continue;
+            }
 
-    continue;
-}
+            /*
+             * MEMORY RECALL
+             */
+            if (result.getAction() == Action.RECALL_MEMORY) {
 
-                if ("GET_STATUS".equals(result.getAction())
-                        && "MEMORY".equals(result.getEntity())) {
+                String value = memoryManager.recall(
+                        result.getEntity(),
+                        result.getParameter()
+                );
 
-                    System.out.println(
-                            "Sūtrādhār: "
-                                    + systemInterface.getMemoryStatus()
-                    );
-                }
-
-                /*
-                 * CPU STATUS
-                 */
-                else if ("GET_STATUS".equals(result.getAction())
-                        && "CPU".equals(result.getEntity())) {
+                if (value != null) {
 
                     System.out.println(
-                            "Sūtrādhār: "
-                                    + systemInterface.getCpuStatus()
-                    );
-                }
-
-                /*
-                 * STORAGE STATUS
-                 */
-                else if ("GET_STATUS".equals(result.getAction())
-                        && "STORAGE".equals(result.getEntity())) {
-
-                    System.out.println(
-                            "Sūtrādhār: "
-                                    + systemInterface.getStorageStatus()
-                    );
-                }
-
-                /*
-                 * PROCESS STATUS
-                 */
-                else if ("GET_STATUS".equals(result.getAction())
-                        && "PROCESSES".equals(result.getEntity())) {
-
-                    System.out.println(
-                            "Sūtrādhār: "
-                                    + systemInterface.getProcessStatus()
-                    );
-                }
-
-                /*
-                 * TIME QUESTION
-                 */
-                else if ("ANSWER".equals(result.getAction())
-                        && result.getParameter() != null
-                        && result.getParameter().contains("time")) {
-
-                    System.out.println(
-                            "Sūtrādhār: The current time is "
-                                    + systemInterface.getCurrentTime()
+                            "Sūtrādhār: Your project is "
+                                    + value
                                     + "."
                     );
-                }
 
-                /*
-                 * Generic system status
-                 */
-                else if ("GET_STATUS".equals(result.getAction())) {
+                } else {
 
                     System.out.println(
-                            "Sūtrādhār: "
-                                    + systemInterface.getSystemStatus()
-                    );
-                }
-
-                /*
-                 * Generic question
-                 */
-                else if ("ANSWER".equals(result.getAction())) {
-
-                    System.out.println(
-                            "Sūtrādhār: I understand that you are asking a question."
+                            "Sūtrādhār: I don't have that information."
                     );
                 }
 
@@ -153,62 +97,102 @@ public class Commander {
             }
 
             /*
-             * MEMORY
+             * GET TIME
              */
-            if (result.getIntent() == Intent.MEMORY) {
+            if (result.getAction() == Action.GET_TIME) {
 
-                /*
-                 * STORE MEMORY
-                 */
-                if ("STORE".equals(result.getAction())) {
-
-                    memoryManager.remember(
-                            result.getKnowledge()
-                    );
-
-                    System.out.println(
-                            "Sūtrādhār: Memory stored."
-                    );
-                }
-
-                /*
-                 * RECALL MEMORY
-                 */
-                else if ("RECALL".equals(result.getAction())) {
-
-                    String value = memoryManager.recall(
-                            result.getEntity(),
-                            result.getParameter()
-                    );
-
-                    if (value != null) {
-
-                        System.out.println(
-                                "Sūtrādhār: Your project is "
-                                        + value
-                                        + "."
-                        );
-
-                    } else {
-
-                        System.out.println(
-                                "Sūtrādhār: I don't have that information."
-                        );
-                    }
-                }
+                System.out.println(
+                        "Sūtrādhār: The current time is "
+                                + systemInterface.getCurrentTime()
+                                + "."
+                );
 
                 continue;
             }
 
             /*
-             * OTHER COMMANDS
+             * MEMORY STATUS
+             */
+            if (result.getAction() == Action.GET_MEMORY_STATUS) {
+
+                System.out.println(
+                        "Sūtrādhār: "
+                                + systemInterface.getMemoryStatus()
+                );
+
+                continue;
+            }
+
+            /*
+             * CPU STATUS
+             */
+            if (result.getAction() == Action.GET_CPU_STATUS) {
+
+                System.out.println(
+                        "Sūtrādhār: "
+                                + systemInterface.getCpuStatus()
+                );
+
+                continue;
+            }
+
+            /*
+             * STORAGE STATUS
+             */
+            if (result.getAction() == Action.GET_STORAGE_STATUS) {
+
+                System.out.println(
+                        "Sūtrādhār: "
+                                + systemInterface.getStorageStatus()
+                );
+
+                continue;
+            }
+
+            /*
+             * PROCESS STATUS
+             */
+            if (result.getAction() == Action.GET_PROCESS_STATUS) {
+
+                System.out.println(
+                        "Sūtrādhār: "
+                                + systemInterface.getProcessStatus()
+                );
+
+                continue;
+            }
+
+            /*
+             * COMPLETE SYSTEM SNAPSHOT
+             */
+            if (result.getAction() == Action.GET_SYSTEM_SNAPSHOT) {
+
+                SystemSnapshot snapshot =
+                        systemInterface.getSystemSnapshot();
+
+                System.out.println(
+                        "Sūtrādhār:\n" + snapshot
+                );
+
+                continue;
+            }
+
+            /*
+             * OTHER ACTIONS
+             *
+             * FILES
+             * APPLICATIONS
+             * GREETINGS
+             * RESEARCH
+             * etc.
              */
             ActionResult actionResult =
-        actionEngine.execute(result);
+                    actionEngine.execute(result);
 
-System.out.println(
-        "Sūtrādhār: " + actionResult.getMessage()
-);
+            System.out.println(
+                    "Sūtrādhār: "
+                            + actionResult.getMessage()
+            );
         }
 
         scanner.close();
