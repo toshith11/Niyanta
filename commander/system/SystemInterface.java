@@ -130,4 +130,103 @@ public String getProcessStatus() {
 
     return "Running processes: " + processCount;
 }
+public SystemSnapshot getSystemSnapshot() {
+
+    double totalMemoryGb = 0;
+    double usedMemoryGb = 0;
+    double availableMemoryGb = 0;
+
+    try {
+
+        List<String> lines =
+                Files.readAllLines(
+                        Path.of("/proc/meminfo")
+                );
+
+        long totalKb = 0;
+        long availableKb = 0;
+
+        for (String line : lines) {
+
+            if (line.startsWith("MemTotal:")) {
+                totalKb = extractValue(line);
+            }
+
+            if (line.startsWith("MemAvailable:")) {
+                availableKb = extractValue(line);
+            }
+        }
+
+        long usedKb = totalKb - availableKb;
+
+        totalMemoryGb = totalKb / 1_048_576.0;
+        usedMemoryGb = usedKb / 1_048_576.0;
+        availableMemoryGb = availableKb / 1_048_576.0;
+
+    } catch (IOException e) {
+        System.out.println(
+                "Unable to read memory information."
+        );
+    }
+
+    double cpuUsagePercent = 0;
+
+    OperatingSystemMXBean osBean =
+            ManagementFactory.getPlatformMXBean(
+                    OperatingSystemMXBean.class
+            );
+
+    double cpuLoad = osBean.getCpuLoad();
+
+    if (cpuLoad >= 0) {
+        cpuUsagePercent = cpuLoad * 100;
+    }
+
+    int availableProcessors =
+            Runtime.getRuntime().availableProcessors();
+
+    double totalStorageGb = 0;
+    double usedStorageGb = 0;
+    double availableStorageGb = 0;
+
+    try {
+
+        Path path = Path.of(".").toAbsolutePath();
+
+        var fileStore = Files.getFileStore(path);
+
+        long total = fileStore.getTotalSpace();
+        long available = fileStore.getUsableSpace();
+        long used = total - available;
+
+        totalStorageGb =
+                total / 1_073_741_824.0;
+
+        usedStorageGb =
+                used / 1_073_741_824.0;
+
+        availableStorageGb =
+                available / 1_073_741_824.0;
+
+    } catch (IOException e) {
+        System.out.println(
+                "Unable to read storage information."
+        );
+    }
+
+    long processCount =
+            ProcessHandle.allProcesses().count();
+
+    return new SystemSnapshot(
+            totalMemoryGb,
+            usedMemoryGb,
+            availableMemoryGb,
+            cpuUsagePercent,
+            availableProcessors,
+            totalStorageGb,
+            usedStorageGb,
+            availableStorageGb,
+            processCount
+    );
+}
 }

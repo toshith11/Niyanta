@@ -178,7 +178,10 @@ public class Understanding {
             || text.contains("cpu")
             || text.contains("processor")
             || text.contains("process")
-            || text.contains("system status");
+            || text.contains("system status")
+            || text.contains("system snapshot")
+            || text.contains("overall system")
+            || text.contains("how is my system");
 }
 
     private boolean isQuestion(String text) {
@@ -257,6 +260,14 @@ public class Understanding {
 }
 
     private String extractSystemTarget(String text) {
+
+    if (text.contains("system status")
+            || text.contains("system snapshot")
+            || text.contains("overall system")
+            || text.contains("how is my system")) {
+
+        return "SNAPSHOT";
+    }
 
     if (text.contains("memory") || text.contains("ram")) {
         return "MEMORY";

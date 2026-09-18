@@ -2,6 +2,7 @@ package commander.core;
 
 import commander.memory.MemoryManager;
 import commander.system.SystemInterface;
+import commander.system.SystemSnapshot;
 
 import java.util.Scanner;
 
@@ -10,11 +11,13 @@ public class Commander {
     private final Understanding understanding;
     private final MemoryManager memoryManager;
     private final SystemInterface systemInterface;
+    private final ActionEngine actionEngine;
 
     public Commander() {
         understanding = new Understanding();
         memoryManager = new MemoryManager();
         systemInterface = new SystemInterface();
+        actionEngine = new ActionEngine();
     }
 
     public void start() {
@@ -53,6 +56,19 @@ public class Commander {
                 /*
                  * MEMORY STATUS
                  */
+                        if ("GET_STATUS".equals(result.getAction())
+        && "SNAPSHOT".equals(result.getEntity())) {
+
+    SystemSnapshot snapshot =
+            systemInterface.getSystemSnapshot();
+
+    System.out.println(
+            "Sūtrādhār:\n" + snapshot
+    );
+
+    continue;
+}
+
                 if ("GET_STATUS".equals(result.getAction())
                         && "MEMORY".equals(result.getEntity())) {
 
@@ -187,9 +203,12 @@ public class Commander {
             /*
              * OTHER COMMANDS
              */
-            System.out.println(
-                    "Sūtrādhār: " + result
-            );
+            ActionResult actionResult =
+        actionEngine.execute(result);
+
+System.out.println(
+        "Sūtrādhār: " + actionResult.getMessage()
+);
         }
 
         scanner.close();
