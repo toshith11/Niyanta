@@ -14,6 +14,8 @@ public class Commander {
     private final ActionEngine actionEngine;
     private final AuthorizationManager authorizationManager;
     private final BackgroundService backgroundService;
+    private final ContextManager contextManager;
+    private final ContextResolver contextResolver;
 
     public Commander() {
         understanding = new Understanding();
@@ -22,6 +24,8 @@ public class Commander {
         actionEngine = new ActionEngine();
         authorizationManager = new AuthorizationManager();
         backgroundService = new BackgroundService();
+        contextManager = new ContextManager();
+        contextResolver = new ContextResolver();
     }
 
     public void start() {
@@ -54,7 +58,17 @@ UserInput userInput =
 
 CommandUnderstanding result =
         understanding.understand(userInput);
+        
+result = contextResolver.resolve(
+        result,
+        contextManager.getContext(),
+        input
+);
 
+contextManager.update(
+        input,
+        result
+);
         double confidence = result.getConfidence();
 
 if (confidence < 0.50) {
@@ -68,9 +82,67 @@ if (confidence < 0.50) {
 
 if (confidence < 0.80) {
 
+    if (result.getIntent() == Intent.RESEARCH) {
+
+        contextManager.setAwaitingInput(
+                "RESEARCH_TOPIC"
+        );
+    }
+
     System.out.println(
             getClarificationMessage(result)
     );
+
+    continue;
+}
+
+if (result.getEntity() != null
+        && result.getEntity().equals("CONTEXT")) {
+
+    ConversationContext context =
+            contextManager.getContext();
+
+    System.out.println(
+            "Sūtrādhār: Current context:"
+    );
+
+    System.out.println(
+            "Last input: "
+                    + context.getLastInput()
+    );
+
+    System.out.println(
+            "Last intent: "
+                    + context.getLastIntent()
+    );
+
+    System.out.println(
+            "Last action: "
+                    + context.getLastAction()
+    );
+
+    System.out.println(
+            "Active task: "
+                    + context.getActiveTask()
+    );
+
+    System.out.println(
+            "Active topic: "
+                    + context.getActiveTopic()
+    );
+    System.out.println("Recent history:");
+
+for (ContextEntry entry :
+        context.getRecentHistory()) {
+
+    System.out.println(
+            "- " + entry.getInput()
+                    + " → "
+                    + entry.getIntent()
+                    + " / "
+                    + entry.getAction()
+    );
+}
 
     continue;
 }

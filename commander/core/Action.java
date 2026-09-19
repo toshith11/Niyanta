@@ -6,6 +6,8 @@ public enum Action {
 
     SEARCH,
 
+    CONTINUE_TASK,
+
     STORE_MEMORY,
     RECALL_MEMORY,
 

@@ -6,6 +6,13 @@ public class AuthorizationManager {
 
         return switch (action) {
 
+            /*
+             * READ-ONLY ACTIONS
+             *
+             * These actions only read information,
+             * answer the user, or continue an existing
+             * reasoning/research task.
+             */
             case GET_TIME,
                  GET_MEMORY_STATUS,
                  GET_CPU_STATUS,
@@ -15,16 +22,26 @@ public class AuthorizationManager {
                  LIST_FILES,
                  RECALL_MEMORY,
                  RESPOND,
-                 SEARCH ->
+                 SEARCH,
+                 CONTINUE_TASK ->
                     RiskLevel.READ_ONLY;
 
+            /*
+             * ACTIONS REQUIRING USER CONFIRMATION
+             */
             case STORE_MEMORY,
                  OPEN_APPLICATION ->
                     RiskLevel.CONFIRMATION_REQUIRED;
 
+            /*
+             * NORMAL TERMINATION
+             */
             case EXIT ->
                     RiskLevel.READ_ONLY;
 
+            /*
+             * Unknown / unsupported action
+             */
             case NONE ->
                     RiskLevel.NOT_ALLOWED;
         };

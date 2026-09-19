@@ -52,6 +52,18 @@ public class Understanding {
         );
     }
 
+    if (isContextFollowUp(text)) {
+
+    return new CommandUnderstanding(
+            Intent.RESEARCH,
+            Action.CONTINUE_TASK,
+            "TOPIC",
+            text,
+            0.85,
+            null
+    );
+}
+
     /*
      * RESEARCH
      */
@@ -138,6 +150,21 @@ public class Understanding {
 
         String target = extractSystemTarget(text);
 
+         /*
+     * CONTEXT
+     */
+    if ("CONTEXT".equals(target)) {
+
+        return new CommandUnderstanding(
+                Intent.SYSTEM,
+                Action.NONE,
+                "CONTEXT",
+                null,
+                0.90,
+                null
+        );
+    }
+
         if ("MEMORY".equals(target)) {
 
             return new CommandUnderstanding(
@@ -210,6 +237,7 @@ public class Understanding {
                 null
         );
     }
+    
 
     /*
      * MEMORY RECALL
@@ -225,6 +253,18 @@ public class Understanding {
                 null
         );
     }
+
+    if (isContextFollowUp(text)) {
+
+    return new CommandUnderstanding(
+            Intent.RESEARCH,
+            Action.CONTINUE_TASK,
+            "TOPIC",
+            text,
+            0.85,
+            null
+    );
+}
 
     /*
      * QUESTION
@@ -260,6 +300,8 @@ public class Understanding {
                 null
         );
     }
+
+    
 
     /*
      * UNKNOWN
@@ -332,7 +374,20 @@ public class Understanding {
             || text.contains("system status")
             || text.contains("system snapshot")
             || text.contains("overall system")
-            || text.contains("how is my system");
+            || text.contains("how is my system")
+            || text.contains("show context")
+            || text.contains("what are we working on");
+}
+
+private boolean isContextFollowUp(String text) {
+
+    return text.startsWith("focus on ")
+            || text.startsWith("continue the research")
+            || text.startsWith("continue research")
+            || text.startsWith("continue it")
+            || text.startsWith("go deeper into ")
+            || text.startsWith("tell me more about ")
+            || text.equals("continue");
 }
 
     private boolean isQuestion(String text) {
@@ -411,6 +466,11 @@ public class Understanding {
 }
 
     private String extractSystemTarget(String text) {
+        if (text.contains("show context")
+        || text.contains("what are we working on")) {
+
+    return "CONTEXT";
+}
 
     if (text.contains("system status")
             || text.contains("system snapshot")
