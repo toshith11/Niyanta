@@ -1,5 +1,5 @@
 package commander.core;
-
+import commander.background.BackgroundService;
 import commander.memory.MemoryManager;
 import commander.system.SystemInterface;
 import commander.system.SystemSnapshot;
@@ -12,12 +12,16 @@ public class Commander {
     private final MemoryManager memoryManager;
     private final SystemInterface systemInterface;
     private final ActionEngine actionEngine;
+    private final AuthorizationManager authorizationManager;
+    private final BackgroundService backgroundService;
 
     public Commander() {
         understanding = new Understanding();
         memoryManager = new MemoryManager();
         systemInterface = new SystemInterface();
         actionEngine = new ActionEngine();
+        authorizationManager = new AuthorizationManager();
+        backgroundService = new BackgroundService();
     }
 
     public void start() {
@@ -27,19 +31,66 @@ public class Commander {
         System.out.println("Sūtrādhār is awake.");
         System.out.println("Niyanta Commander initialized.");
         System.out.println();
+        backgroundService.start();
+
+System.out.println(
+        "Sūtrādhār background service started."
+);
 
         while (true) {
 
             System.out.print("You: ");
             String input = scanner.nextLine();
+            if (input.isBlank()) {
+    continue;
+}
 
             CommandUnderstanding result =
                     understanding.understand(input);
 
+            Action action = result.getAction();
+
             /*
-             * EXIT
+             * 1. AUTHORIZATION
              */
-            if (result.getAction() == Action.EXIT) {
+            RiskLevel riskLevel =
+                    authorizationManager.getRiskLevel(action);
+
+            if (riskLevel == RiskLevel.NOT_ALLOWED) {
+
+                System.out.println(
+                        "Sūtrādhār: This action is not permitted."
+                );
+
+                continue;
+            }
+
+            if (authorizationManager.requiresConfirmation(action)) {
+
+                System.out.println(
+                        "Sūtrādhār: This action requires confirmation: "
+                                + action
+                );
+
+                System.out.print("Allow? (yes/no): ");
+
+                String confirmation =
+                        scanner.nextLine();
+
+                if (!confirmation.equalsIgnoreCase("yes")) {
+
+                    System.out.println(
+                            "Sūtrādhār: Action cancelled."
+                    );
+
+                    continue;
+                }
+            }
+
+            /*
+             * 2. EXIT
+             */
+            if (action == Action.EXIT) {
 
                 System.out.println(
                         "Sūtrādhār: " + result
@@ -53,9 +104,9 @@ public class Commander {
             }
 
             /*
-             * MEMORY STORE
+             * 3. MEMORY STORE
              */
-            if (result.getAction() == Action.STORE_MEMORY) {
+            if (action == Action.STORE_MEMORY) {
 
                 memoryManager.remember(
                         result.getKnowledge()
@@ -69,14 +120,15 @@ public class Commander {
             }
 
             /*
-             * MEMORY RECALL
+             * 4. MEMORY RECALL
              */
-            if (result.getAction() == Action.RECALL_MEMORY) {
+            if (action == Action.RECALL_MEMORY) {
 
-                String value = memoryManager.recall(
-                        result.getEntity(),
-                        result.getParameter()
-                );
+                String value =
+                        memoryManager.recall(
+                                result.getEntity(),
+                                result.getParameter()
+                        );
 
                 if (value != null) {
 
@@ -97,9 +149,9 @@ public class Commander {
             }
 
             /*
-             * GET TIME
+             * 5. SYSTEM ACTIONS
              */
-            if (result.getAction() == Action.GET_TIME) {
+            if (action == Action.GET_TIME) {
 
                 System.out.println(
                         "Sūtrādhār: The current time is "
@@ -110,10 +162,7 @@ public class Commander {
                 continue;
             }
 
-            /*
-             * MEMORY STATUS
-             */
-            if (result.getAction() == Action.GET_MEMORY_STATUS) {
+            if (action == Action.GET_MEMORY_STATUS) {
 
                 System.out.println(
                         "Sūtrādhār: "
@@ -123,10 +172,7 @@ public class Commander {
                 continue;
             }
 
-            /*
-             * CPU STATUS
-             */
-            if (result.getAction() == Action.GET_CPU_STATUS) {
+            if (action == Action.GET_CPU_STATUS) {
 
                 System.out.println(
                         "Sūtrādhār: "
@@ -136,10 +182,7 @@ public class Commander {
                 continue;
             }
 
-            /*
-             * STORAGE STATUS
-             */
-            if (result.getAction() == Action.GET_STORAGE_STATUS) {
+            if (action == Action.GET_STORAGE_STATUS) {
 
                 System.out.println(
                         "Sūtrādhār: "
@@ -149,10 +192,7 @@ public class Commander {
                 continue;
             }
 
-            /*
-             * PROCESS STATUS
-             */
-            if (result.getAction() == Action.GET_PROCESS_STATUS) {
+            if (action == Action.GET_PROCESS_STATUS) {
 
                 System.out.println(
                         "Sūtrādhār: "
@@ -162,10 +202,7 @@ public class Commander {
                 continue;
             }
 
-            /*
-             * COMPLETE SYSTEM SNAPSHOT
-             */
-            if (result.getAction() == Action.GET_SYSTEM_SNAPSHOT) {
+            if (action == Action.GET_SYSTEM_SNAPSHOT) {
 
                 SystemSnapshot snapshot =
                         systemInterface.getSystemSnapshot();
@@ -178,13 +215,7 @@ public class Commander {
             }
 
             /*
-             * OTHER ACTIONS
-             *
-             * FILES
-             * APPLICATIONS
-             * GREETINGS
-             * RESEARCH
-             * etc.
+             * 6. ACTION ENGINE
              */
             ActionResult actionResult =
                     actionEngine.execute(result);
@@ -194,7 +225,7 @@ public class Commander {
                             + actionResult.getMessage()
             );
         }
-
+        backgroundService.stop();
         scanner.close();
     }
 }
