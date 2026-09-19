@@ -1,9 +1,28 @@
 package commander.core;
 public class Understanding {
+    private final IntentClassifier intentClassifier;
+
+    public Understanding() {
+        intentClassifier = new IntentClassifier();
+    }
+
+    public CommandUnderstanding understand(UserInput input) {
+
+    return understand(input.getText());
+}
 
    public CommandUnderstanding understand(String input) {
 
-    String text = normalize(input);
+      String text = normalize(input);
+
+    ClassificationResult classification =
+            intentClassifier.classify(text);
+
+    Intent intent = classification.getIntent();
+
+    double confidence = classification.getConfidence();
+
+    
 
     /*
      * EXIT
@@ -38,17 +57,23 @@ public class Understanding {
      */
     if (isResearch(text)) {
 
-        String topic = extractResearchTopic(text);
+    String topic = extractResearchTopic(text);
 
-        return new CommandUnderstanding(
-                Intent.RESEARCH,
-                Action.SEARCH,
-                "TOPIC",
-                topic,
-                0.90,
-                null
-        );
+    double researchConfidence = 0.90;
+
+    if (topic == null || topic.isBlank()) {
+        researchConfidence = 0.60;
     }
+
+    return new CommandUnderstanding(
+            Intent.RESEARCH,
+            Action.SEARCH,
+            "TOPIC",
+            topic,
+            researchConfidence,
+            null
+    );
+}
 
     /*
      * MEMORY
@@ -88,17 +113,23 @@ public class Understanding {
      */
     if (isApplication(text)) {
 
-        String application = extractApplication(text);
+    String application = extractApplication(text);
 
-        return new CommandUnderstanding(
-                Intent.APPLICATION,
-                Action.OPEN_APPLICATION,
-                application,
-                null,
-                0.90,
-                null
-        );
+    double applicationConfidence = 0.90;
+
+    if ("UNKNOWN_APPLICATION".equals(application)) {
+        applicationConfidence = 0.60;
     }
+
+    return new CommandUnderstanding(
+            Intent.APPLICATION,
+            Action.OPEN_APPLICATION,
+            application,
+            null,
+            applicationConfidence,
+            null
+    );
+}
 
     /*
      * SYSTEM

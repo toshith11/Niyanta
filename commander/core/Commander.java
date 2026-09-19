@@ -41,12 +41,39 @@ System.out.println(
 
             System.out.print("You: ");
             String input = scanner.nextLine();
-            if (input.isBlank()) {
+
+if (input.isBlank()) {
     continue;
 }
 
-            CommandUnderstanding result =
-                    understanding.understand(input);
+UserInput userInput =
+        new UserInput(
+                input,
+                InputSource.TEXT
+        );
+
+CommandUnderstanding result =
+        understanding.understand(userInput);
+
+        double confidence = result.getConfidence();
+
+if (confidence < 0.50) {
+
+    System.out.println(
+            "Sūtrādhār: I am not confident enough to understand that command."
+    );
+
+    continue;
+}
+
+if (confidence < 0.80) {
+
+    System.out.println(
+            getClarificationMessage(result)
+    );
+
+    continue;
+}
 
             Action action = result.getAction();
 
@@ -228,4 +255,36 @@ System.out.println(
         backgroundService.stop();
         scanner.close();
     }
+
+    private String getClarificationMessage(
+        CommandUnderstanding result) {
+
+    if (result.getAction() == Action.OPEN_APPLICATION
+            && "UNKNOWN_APPLICATION".equals(
+                    result.getEntity())) {
+
+        return "Sūtrādhār: Which application should I open?";
+    }
+
+    if (result.getIntent() == Intent.RESEARCH
+            && (result.getParameter() == null
+            || result.getParameter().isBlank())) {
+
+        return "Sūtrādhār: What would you like me to research?";
+    }
+
+    if (result.getIntent() == Intent.MEMORY
+            && result.getAction() == Action.STORE_MEMORY
+            && result.getKnowledge() == null) {
+
+        return "Sūtrādhār: What would you like me to remember?";
+    }
+
+    if (result.getIntent() == Intent.QUESTION) {
+
+        return "Sūtrādhār: Could you rephrase the question?";
+    }
+
+    return "Sūtrādhār: Could you clarify what you want me to do?";
+}
 }
