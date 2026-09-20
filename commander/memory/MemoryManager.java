@@ -33,14 +33,19 @@ public class MemoryManager {
         }
     }
 
-    public void remember(Knowledge knowledge) {
+    /*
+     * Store memory with an explicitly selected memory type.
+     */
+    public void remember(
+            Knowledge knowledge,
+            MemoryType memoryType) {
 
-        if (knowledge == null) {
+        if (knowledge == null || memoryType == null) {
             return;
         }
 
         MemoryRecord newMemory = new MemoryRecord(
-                MemoryType.LONG_TERM,
+                memoryType,
                 knowledge.getSubject(),
                 knowledge.getRelation(),
                 knowledge.getValue()
@@ -54,11 +59,15 @@ public class MemoryManager {
 
             MemoryRecord existing = memories.get(i);
 
-            if (existing.getSubject()
-                    .equalsIgnoreCase(newMemory.getSubject())
-                    &&
-                existing.getRelation()
-                    .equalsIgnoreCase(newMemory.getRelation())) {
+            if (existing.getType() == memoryType
+                    && existing.getSubject()
+                    .equalsIgnoreCase(
+                            newMemory.getSubject()
+                    )
+                    && existing.getRelation()
+                    .equalsIgnoreCase(
+                            newMemory.getRelation()
+                    )) {
 
                 memories.set(i, newMemory);
                 updated = true;
@@ -73,7 +82,37 @@ public class MemoryManager {
         saveMemories(memories);
     }
 
-    public String recall(String subject, String relation) {
+    /*
+     * Default memory storage.
+     *
+     * Existing Commander code can continue using:
+     * remember(knowledge)
+     */
+    public void remember(Knowledge knowledge) {
+
+        remember(
+                knowledge,
+                MemoryType.LONG_TERM
+        );
+    }
+
+    /*
+     * Explicit long-term memory storage.
+     */
+    public void rememberLongTerm(Knowledge knowledge) {
+
+        remember(
+                knowledge,
+                MemoryType.LONG_TERM
+        );
+    }
+
+    /*
+     * Recall a memory by subject and relation.
+     */
+    public String recall(
+            String subject,
+            String relation) {
 
         List<MemoryRecord> memories = loadMemories();
 
@@ -92,6 +131,9 @@ public class MemoryManager {
         return null;
     }
 
+    /*
+     * Load all persistent memories from disk.
+     */
     private List<MemoryRecord> loadMemories() {
 
         List<MemoryRecord> memories = new ArrayList<>();
@@ -103,23 +145,40 @@ public class MemoryManager {
 
             for (String line : lines) {
 
-                String[] parts = line.split("\\|", 4);
+                String[] parts =
+                        line.split("\\|", 4);
 
                 if (parts.length != 4) {
                     continue;
                 }
 
-                MemoryRecord memory = new MemoryRecord(
-        MemoryType.valueOf(parts[0].trim()),
-        parts[1].trim(),
-        parts[2].trim(),
-        parts[3].trim()
-);
+                try {
 
-                memories.add(memory);
+                    MemoryRecord memory =
+                            new MemoryRecord(
+                                    MemoryType.valueOf(
+                                            parts[0].trim()
+                                    ),
+                                    parts[1].trim(),
+                                    parts[2].trim(),
+                                    parts[3].trim()
+                            );
+
+                    memories.add(memory);
+
+                } catch (IllegalArgumentException e) {
+
+                    /*
+                     * Ignore malformed or unknown
+                     * memory records instead of crashing
+                     * the entire Commander.
+                     */
+                    continue;
+                }
             }
 
         } catch (IOException e) {
+
             throw new RuntimeException(
                     "Could not load memory.",
                     e
@@ -129,7 +188,11 @@ public class MemoryManager {
         return memories;
     }
 
-    private void saveMemories(List<MemoryRecord> memories) {
+    /*
+     * Save all memories back to disk.
+     */
+    private void saveMemories(
+            List<MemoryRecord> memories) {
 
         List<String> lines = new ArrayList<>();
 
@@ -145,6 +208,7 @@ public class MemoryManager {
             );
 
         } catch (IOException e) {
+
             throw new RuntimeException(
                     "Could not save memory.",
                     e

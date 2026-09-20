@@ -115,7 +115,13 @@ public class IntentClassifier {
                 "store this",
                 "what is my project",
                 "what's my project",
-                "what project am i working on");
+                "what project am i working on",
+                "what was I researching",
+                "what was i researching",
+                "what did I research",
+                "what have I researched",
+                "show my research history",
+                "what was my research");
     }
 
     private void scoreFile(
@@ -147,24 +153,27 @@ public class IntentClassifier {
     }
 
     private void scoreSystem(
-            String text,
-            Map<Intent, Integer> scores) {
+        String text,
+        Map<Intent, Integer> scores) {
 
-        addScore(scores, Intent.SYSTEM, text,
-                "memory",
-                "ram",
-                "cpu",
-                "processor",
-                "storage",
-                "disk",
-                "process",
-                "processes",
-                "battery",
-                "system status",
-                "system health",
-                "system usage",
-                "resource usage");
-    }
+    addScore(scores, Intent.SYSTEM, text,
+            "memory",
+            "ram",
+            "cpu",
+            "processor",
+            "storage",
+            "disk",
+            "process",
+            "processes",
+            "battery",
+            "system status",
+            "system health",
+            "system usage",
+            "resource usage",
+            "show recent episodes",
+            "show history",
+            "recent episodes");
+}
 
     private void scoreQuestion(
             String text,
